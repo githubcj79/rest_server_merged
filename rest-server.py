@@ -18,11 +18,31 @@ tasks = [
 ]
 
 # CHROME: http://127.0.0.1:5000/people
-# GET /people -> devuelve la lista completa de las personas existentes
+# GET /people
 @app.route('/people', methods=['GET'])
-def get_tasks():
+def get_people():
     return jsonify({'tasks': tasks})
 
-@app.route('/')
-def index():
-  return '<h1>Hello World!</h1>'
+# GET /people/:rut
+@app.route('/people/<rut>', methods=['GET'])
+def get_rut(rut):
+    return jsonify({'tasks': tasks})
+
+# POST /people + json
+@app.route('/people', methods=['POST'])
+def create_person():
+    return jsonify({'tasks': tasks})
+
+# PUT /people/:id + json
+@app.route('/people/<id>', methods=['PUT'])
+def update_person(id):
+    return jsonify({'tasks': tasks})
+
+# DELETE /people/:id
+@app.route('/people/<id>', methods=['DELETE'])
+def delete_id(id):
+    return jsonify({'tasks': tasks})
+
+# @app.route('/')
+# def index():
+#   return '<h1>Hello World!</h1>'
