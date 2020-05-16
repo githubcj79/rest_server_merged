@@ -1,5 +1,5 @@
 import os
-from flask import Flask, jsonify, abort, request, make_response, url_for
+from flask import Flask, jsonify, abort, request, make_response
 from flask_sqlalchemy import SQLAlchemy
 
 basedir = os.path.abspath(os.path.dirname(__file__))
@@ -46,29 +46,12 @@ class Person(db.Model):
 def make_shell_context():
     return dict(db=db, Person=Person)
 
-# tasks = [
-#     {
-#         'id': 1,
-#         'title': u'Buy groceries',
-#         'description': u'Milk, Cheese, Pizza, Fruit, Tylenol',
-#         'done': False
-#     },
-#     {
-#         'id': 2,
-#         'title': u'Learn Python',
-#         'description': u'Need to find a good Python tutorial on the web',
-#         'done': False
-#     }
-# ]
-
-# CHROME: http://127.0.0.1:5000/people
 # GET /people
 @app.route('/people', methods=['GET'])
 def get_people():
     people = Person.query.all()
     list_ = [person_.asdict() for person_ in people]
     return jsonify( {'people': list_} ), 200
-    # return jsonify({'tasks': tasks})
 
 # GET /people/:rut
 @app.route('/people/<rut>', methods=['GET'])
@@ -77,7 +60,6 @@ def get_rut(rut):
     if person_ is None:
         abort(404)
     return jsonify( {'person': person_.asdict()} ), 200
-    # return jsonify({'tasks': tasks})
 
 # POST /people + json
 @app.route('/people', methods=['POST'])
@@ -118,7 +100,6 @@ def update_person(id):
     db.session.add(person_)
     db.session.commit()
     return jsonify( {'person': person_dict} ), 200
-    # return jsonify({'tasks': tasks})
 
 # DELETE /people/:id
 @app.route('/people/<id>', methods=['DELETE'])
@@ -129,8 +110,3 @@ def delete_id(id):
     db.session.delete(person_)
     db.session.commit()
     return jsonify( {'person': person_.asdict()} ), 200
-    # return jsonify({'tasks': tasks})
-
-# @app.route('/')
-# def index():
-#   return '<h1>Hello World!</h1>'
