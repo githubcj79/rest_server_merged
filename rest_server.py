@@ -102,7 +102,23 @@ def create_person():
 # PUT /people/:id + json
 @app.route('/people/<id>', methods=['PUT'])
 def update_person(id):
-    return jsonify({'tasks': tasks})
+    if not request.json:
+        abort(400)
+    person_ = Person.query.filter_by(id=id).first()
+    if person_ is None:
+        abort(404)
+    person_dict = person_.asdict()
+    for key in ['name', 'lastName', 'age', 'course']:
+        if key in request.json:
+            person_dict[key] = request.json[key]
+    person_.name = person_dict['name']
+    person_.lastName = person_dict['lastName']
+    person_.age = person_dict['age']
+    person_.course = person_dict['course']
+    db.session.add(person_)
+    db.session.commit()
+    return jsonify( {'person': person_dict} ), 200
+    # return jsonify({'tasks': tasks})
 
 # DELETE /people/:id
 @app.route('/people/<id>', methods=['DELETE'])
