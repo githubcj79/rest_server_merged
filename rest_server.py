@@ -123,7 +123,13 @@ def update_person(id):
 # DELETE /people/:id
 @app.route('/people/<id>', methods=['DELETE'])
 def delete_id(id):
-    return jsonify({'tasks': tasks})
+    person_ = Person.query.filter_by(id=id).first()
+    if person_ is None:
+        abort(404)
+    db.session.delete(person_)
+    db.session.commit()
+    return jsonify( {'person': person_.asdict()} ), 200
+    # return jsonify({'tasks': tasks})
 
 # @app.route('/')
 # def index():
