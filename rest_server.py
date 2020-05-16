@@ -66,7 +66,9 @@ def make_shell_context():
 @app.route('/people', methods=['GET'])
 def get_people():
     people = Person.query.all()
-    return jsonify({'tasks': tasks})
+    list_ = [person_.asdict() for person_ in people]
+    return jsonify( {'people': list_} ), 200
+    # return jsonify({'tasks': tasks})
 
 # GET /people/:rut
 @app.route('/people/<rut>', methods=['GET'])
