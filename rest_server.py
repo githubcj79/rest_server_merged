@@ -1,19 +1,27 @@
 import os
 from flask import Flask, jsonify, abort, request, make_response
+from flask_httpauth import HTTPBasicAuth
 from flask_sqlalchemy import SQLAlchemy
 
 basedir = os.path.abspath(os.path.dirname(__file__))
 
 app = Flask(__name__)
-# app.config['SECRET_KEY'] = 'hard to guess string'
 app.config['SQLALCHEMY_DATABASE_URI'] =\
     'sqlite:///' + os.path.join(basedir, 'data.sqlite')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-# @auth.error_handler
-# def unauthorized():
-#     return make_response(jsonify( { 'error': 'Unauthorized access' } ), 403)
-#     # return 403 instead of 401 to prevent browsers from displaying the default auth dialog
+auth = HTTPBasicAuth()
+
+@auth.get_password
+def get_password(username):
+    if username == 'ghost':
+        return 'python'
+    return None
+
+@auth.error_handler
+def unauthorized():
+    return make_response(jsonify( { 'error': 'Unauthorized access' } ), 403)
+    # return 403 instead of 401 to prevent browsers from displaying the default auth dialog
 
 @app.errorhandler(400)
 def not_found(error):
@@ -48,6 +56,7 @@ def make_shell_context():
 
 # GET /people
 @app.route('/people', methods=['GET'])
+@auth.login_required
 def get_people():
     people = Person.query.all()
     list_ = [person_.asdict() for person_ in people]
@@ -55,6 +64,7 @@ def get_people():
 
 # GET /people/:rut
 @app.route('/people/<rut>', methods=['GET'])
+@auth.login_required
 def get_rut(rut):
     person_ = Person.query.filter_by(rut=rut).first()
     if person_ is None:
@@ -63,6 +73,7 @@ def get_rut(rut):
 
 # POST /people + json
 @app.route('/people', methods=['POST'])
+@auth.login_required
 def create_person():
     if not request.json or not 'rut' in request.json:
         abort(400)
@@ -83,6 +94,7 @@ def create_person():
 
 # PUT /people/:id + json
 @app.route('/people/<id>', methods=['PUT'])
+@auth.login_required
 def update_person(id):
     if not request.json:
         abort(400)
@@ -103,6 +115,7 @@ def update_person(id):
 
 # DELETE /people/:id
 @app.route('/people/<id>', methods=['DELETE'])
+@auth.login_required
 def delete_id(id):
     person_ = Person.query.filter_by(id=id).first()
     if person_ is None:
