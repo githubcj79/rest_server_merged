@@ -46,20 +46,20 @@ class Person(db.Model):
 def make_shell_context():
     return dict(db=db, Person=Person)
 
-tasks = [
-    {
-        'id': 1,
-        'title': u'Buy groceries',
-        'description': u'Milk, Cheese, Pizza, Fruit, Tylenol',
-        'done': False
-    },
-    {
-        'id': 2,
-        'title': u'Learn Python',
-        'description': u'Need to find a good Python tutorial on the web',
-        'done': False
-    }
-]
+# tasks = [
+#     {
+#         'id': 1,
+#         'title': u'Buy groceries',
+#         'description': u'Milk, Cheese, Pizza, Fruit, Tylenol',
+#         'done': False
+#     },
+#     {
+#         'id': 2,
+#         'title': u'Learn Python',
+#         'description': u'Need to find a good Python tutorial on the web',
+#         'done': False
+#     }
+# ]
 
 # CHROME: http://127.0.0.1:5000/people
 # GET /people
@@ -71,7 +71,11 @@ def get_people():
 # GET /people/:rut
 @app.route('/people/<rut>', methods=['GET'])
 def get_rut(rut):
-    return jsonify({'tasks': tasks})
+    person_ = Person.query.filter_by(rut=rut).first()
+    if person_ is None:
+        abort(404)
+    return jsonify( {'person': person_.asdict()} ), 200
+    # return jsonify({'tasks': tasks})
 
 # POST /people + json
 @app.route('/people', methods=['POST'])
@@ -92,8 +96,6 @@ def create_person():
     else:
         abort(400)
     return jsonify( {'person': person_.asdict()} ), 201
-
-    # return jsonify({'tasks': tasks})
 
 # PUT /people/:id + json
 @app.route('/people/<id>', methods=['PUT'])
