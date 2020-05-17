@@ -15,11 +15,32 @@ def hello_world():
 import os
 from flask import Flask, jsonify, abort, request, make_response
 from flask_httpauth import HTTPBasicAuth
-# from flask_sqlalchemy import SQLAlchemy
+from flask_sqlalchemy import SQLAlchemy
 
 # basedir = os.path.abspath(os.path.dirname(__file__))
 
 app = Flask(__name__)
+app.config.from_object("project.config.Config")
+db = SQLAlchemy(app)
+
+class Person(db.Model):
+    __tablename__ = 'people'
+    id = db.Column(db.Integer, primary_key=True)
+    rut = db.Column(db.String(64), unique=True, index=True)
+    name = db.Column(db.String(64), unique=False, index=False)
+    lastName = db.Column(db.String(64), unique=False, index=False)
+    age = db.Column(db.Integer, unique=False, index=False)
+    course = db.Column(db.Integer, unique=False, index=False)
+
+    def __repr__(self):
+        return '<Person %r>' % self.rut
+
+    def asdict(self):
+        return {'id': self.id, 'rut': self.rut,
+                'name': self.name, 'lastName': self.lastName,
+                'age': self.age, 'course': self.course}
+
+
 # app.config['SQLALCHEMY_DATABASE_URI'] =\
 #     'sqlite:///' + os.path.join(basedir, 'data.sqlite')
 # app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
